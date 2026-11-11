@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private LinearLayout page, cards, history;
     private TextView status;
-    private Button refresh, choose, restore;
+    private Button refresh, choose, restore, clearHistory;
     private Art selected;
     private int foreground, accent, onAccent, surface, container;
     private boolean busy;
@@ -114,6 +114,7 @@ public class MainActivity extends Activity {
         history = new LinearLayout(this);
         strip.addView(history);
         page.addView(strip);
+        clearHistory = button("Очистить историю", false, this::confirmClearHistory);
         renderHistory();
         controls();
     }
@@ -140,6 +141,8 @@ public class MainActivity extends Activity {
     }
     private void controls() {
         refresh.setEnabled(!busy);
+        clearHistory.setEnabled(!busy && historyFiles().length > 0);
+        clearHistory.setAlpha(clearHistory.isEnabled() ? 1f : .45f);
         choose.setEnabled(!busy && selected!=null);
         restore.setEnabled(!busy && new File(getFilesDir(),"undo/paths").isFile());
         choose.setAlpha(choose.isEnabled()?1f:.45f);
@@ -293,6 +296,26 @@ public class MainActivity extends Activity {
         super.onActivityResult(request,result,data);
         if(request!=1 || result!=RESULT_OK || data==null || selected==null) return;
         confirmPhoto(data.getData(), null);
+    }
+
+    private void confirmClearHistory() {
+        new AlertDialog.Builder(this)
+            .setTitle("Очистить историю?")
+            .setMessage("Все сохранённые фото будут удалены из Swoo Changer.")
+            .setNegativeButton("Отмена",null)
+            .setPositiveButton("Очистить",(dialog,which) -> task("Очищаю историю…",() -> {
+                int failed = 0;
+                for (File photo : historyFiles()) {
+                    if (!photo.delete() && photo.exists()) failed++;
+                }
+                String message = failed == 0 ? "История очищена." :
+                    "Не удалось удалить фото: " + failed;
+                runOnUiThread(() -> {
+                    renderHistory();
+                    status.setText(message);
+                });
+            }))
+            .show();
     }
 
     private File[] historyFiles() {
