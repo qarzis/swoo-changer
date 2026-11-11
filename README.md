@@ -1,21 +1,35 @@
 # Swoo Changer
 
-An unofficial Android app that replaces cached bank card artwork in Swoo Pay on rooted devices. It includes previews, a system photo picker, local photo history, and undo for the most recent replacement.
+Swoo Changer позволяет поставить своё фото на обложку банковской карты в Swoo Pay. Приложение находит изображения в локальном кэше кошелька и показывает их миниатюры. Выбираешь нужную карту, берёшь фото из галереи, и Swoo Changer подгоняет его под размер обложки.
 
-## Requirements
+## Что понадобится
 
-- Android 12 or newer
-- Root access through a root manager that provides `su`
-- A Swoo Pay installation with artwork already cached
+- Android 12 или новее.
+- Установленный Swoo Pay с добавленной банковской картой.
+- Root-менеджер, который выдаёт приложениям доступ через `su`, например KernelSU Next.
 
-Open the card in Swoo Pay first. In Swoo Changer, scan for artwork, select the matching preview, and pick a replacement photo. Swoo Pay may replace the customized image when it refreshes its cache.
+## Как поменять обложку
 
-## Build on Windows
+1. Открой нужную карту в Swoo Pay, чтобы кошелёк загрузил её обложку.
+2. Открой **Swoo Changer** и нажми **«Найти обложки»**. При первом запуске поиска разреши root-доступ в менеджере.
+3. Найди свою обложку по миниатюре и нажми на неё. Выбранная обложка выделится рамкой.
+4. Нажми **«Выбрать фото из галереи»** и выбери изображение. В окне **«Заменить карту?»** проверь превью и нажми **«Заменить»**. Фото заполнит обложку целиком с растяжением до её пропорций.
+5. Снова открой Swoo Pay и проверь обложку в списке карт и на экране оплаты.
 
-Install JDK 17, Android SDK Platform 34 and Android SDK Build-Tools 34.0.0. Run:
+## История и откат
+
+- **История фото** хранит до 12 применённых снимков на устройстве. Чтобы использовать снимок повторно, выбери обложку в результатах поиска и нажми на миниатюру в истории.
+- **Очистить историю** удаляет сохранённые снимки из Swoo Changer. Установленная обложка останется на карте.
+- **Отменить последнюю замену** восстанавливает обложку, которая стояла перед последней заменой.
+
+Если карта не появилась в результатах, открой её в Swoo Pay, дождись загрузки картинки и повтори поиск. Если приложение сообщает об ошибке root, проверь разрешение для Swoo Changer в root-менеджере. Swoo Pay может вернуть исходную обложку при обновлении своего кэша.
+
+## Сборка на Windows
+
+Установи JDK 17, Android SDK Platform 34 и Android SDK Build-Tools 34.0.0. Из папки репозитория запусти:
 
 ```powershell
 ./build.ps1 -SdkRoot 'C:/path/to/Android/Sdk' -JdkRoot 'C:/path/to/jdk-17'
 ```
 
-The output is `build/swoo-changer-unsigned.apk`. Sign it with your own Android signing key before installation. Updating an installed APK requires the same signing key as the existing installation.
+Результат появится в `build/swoo-changer-unsigned.apk`. Перед установкой подпиши APK своим ключом. Для обновления установленной версии нужен тот же ключ, которым она подписана.
